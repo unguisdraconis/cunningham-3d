@@ -4342,6 +4342,7 @@
       renderer.setSize(innerWidth, innerHeight);
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
+      renderer.domElement.style.touchAction = "none";
       const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
       ctrl.enableDamping = true;
       ctrl.dampingFactor = 0.05;
@@ -4997,6 +4998,41 @@
       });
 
       renderer.domElement.addEventListener("click", function (e) {
+        var si = raycastHit(e.clientX, e.clientY);
+        if (si === null) return;
+
+        if (isPinned) {
+          if (si !== pinnedSi) {
+            pinCard(si, e.clientX, e.clientY);
+          }
+        } else {
+          pinCard(si, e.clientX, e.clientY);
+        }
+      });
+
+      renderer.domElement.addEventListener("pointermove", function (e) {
+        if (e.pointerType === "mouse") return;
+        if (isPinned) return;
+
+        var si = raycastHit(e.clientX, e.clientY);
+        if (si !== null) {
+          if (hoveredSi !== si) {
+            if (hoveredSi !== null) unhighlightNode(hoveredSi);
+            hoveredSi = si;
+            highlightNode(si);
+          }
+          showCard(si, e.clientX, e.clientY);
+        } else {
+          if (hoveredSi !== null) {
+            unhighlightNode(hoveredSi);
+            hoveredSi = null;
+          }
+          hideCard();
+        }
+      });
+
+      renderer.domElement.addEventListener("pointerup", function (e) {
+        if (e.pointerType === "mouse") return;
         var si = raycastHit(e.clientX, e.clientY);
         if (si === null) return;
 
