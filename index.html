@@ -4606,6 +4606,10 @@
       let hoveredSi = null;
       let pinnedSi = null;
       let isPinned = false;
+      let touchDownX = 0;
+      let touchDownY = 0;
+      let touchDownTime = 0;
+      let touchDownSi = null;
 
       const capsuleLinks = {
         "Nearly 90²":
@@ -5010,6 +5014,14 @@
         }
       });
 
+      renderer.domElement.addEventListener("pointerdown", function (e) {
+        if (e.pointerType !== "touch") return;
+        touchDownX = e.clientX;
+        touchDownY = e.clientY;
+        touchDownTime = Date.now();
+        touchDownSi = raycastHit(e.clientX, e.clientY);
+      });
+
       renderer.domElement.addEventListener("pointermove", function (e) {
         if (e.pointerType === "mouse") return;
         if (isPinned) return;
@@ -5033,16 +5045,25 @@
 
       renderer.domElement.addEventListener("pointerup", function (e) {
         if (e.pointerType === "mouse") return;
-        var si = raycastHit(e.clientX, e.clientY);
-        if (si === null) return;
+        if (touchDownSi === null) return;
 
-        if (isPinned) {
-          if (si !== pinnedSi) {
+        var dx = e.clientX - touchDownX;
+        var dy = e.clientY - touchDownY;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var elapsed = Date.now() - touchDownTime;
+        var si = raycastHit(e.clientX, e.clientY);
+
+        if (dist <= 12 && elapsed < 500 && si === touchDownSi) {
+          if (isPinned) {
+            if (si !== pinnedSi) {
+              pinCard(si, e.clientX, e.clientY);
+            }
+          } else {
             pinCard(si, e.clientX, e.clientY);
           }
-        } else {
-          pinCard(si, e.clientX, e.clientY);
         }
+
+        touchDownSi = null;
       });
 
       // Prevent canvas click from also triggering on the card
