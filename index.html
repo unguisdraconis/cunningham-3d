@@ -173,6 +173,18 @@
       #info-card.collab-line.role {
         color: #5a7a9a;
       }
+      #info-card .capsule-link {
+        margin: 8px 0 10px;
+        font-size: 12px;
+        color: #aad4ff;
+      }
+      #info-card .capsule-link a {
+        color: #ffb83c;
+        text-decoration: none;
+      }
+      #info-card .capsule-link a:hover {
+        text-decoration: underline;
+      }
       #info-card.duration-badge {
         display: inline-block;
         background: rgba(74, 158, 255, 0.15);
@@ -451,6 +463,7 @@
       <h3 id="card-name"></h3>
       <div class="subtitle" id="card-subtitle"></div>
       <div id="card-meta"></div>
+      <div id="card-capsule-link"></div>
       <div id="card-collabs"></div>
       <div class="section-label" id="card-cast-label">ORIGINAL CAST</div>
       <div class="cast-list" id="card-cast"></div>
@@ -4588,6 +4601,179 @@
       let pinnedSi = null;
       let isPinned = false;
 
+      const capsuleLinks = {
+        "Nearly 90²":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46082",
+        "Nearly Ninety":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46083",
+        XOVER:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46111",
+        "eyeSpace (40')":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46063",
+        "eyeSpace (20')":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46061",
+        "Views on Stage":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46120",
+        "Split Sides":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46105",
+        "Loose Time":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46078",
+        "Way Station":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46122",
+        Interscape:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46073",
+        BIPED:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46049",
+        "Pond Way":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46034",
+        Scenario:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46097",
+        Rondo:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46093",
+        Windows:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46116",
+        "Ground Level Overlay":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46070",
+        Ocean:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46086",
+        CRWDSPCR:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46040",
+        Doubletoss:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46058",
+        Enter:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46059",
+        "Change of Address":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46050",
+        Loosestrife:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46079",
+        "Beach Birds":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46030",
+        Trackers:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46112",
+        "August Pace":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46029",
+        "Five Stone Wind":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46066",
+        "Points In Space":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46089",
+        Shards:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46101",
+        Fabrications:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46032",
+        "Native Green":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46081",
+        Doubles:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46057",
+        Pictures:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46087",
+        "Inlets 2":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46072",
+        Roaratorio:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46035",
+        Quartet:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46090",
+        Trails:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46114",
+        "Channels/Inserts":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46038",
+        "Fielding Sixes":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46065",
+        Duets:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46031",
+        Locale:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46077",
+        Roadrunners:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46092",
+        Exchange:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46060",
+        Fractions:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46069",
+        Inlets:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46071",
+        Squaregame:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46027",
+        Torse:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46109",
+        Sounddance:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46037",
+        Rebus:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46091",
+        "Un jour ou deux":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46118",
+        "Changing Steps":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46051",
+        "TV Rerun":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46117",
+        Landrover:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46074",
+        Signals:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46102",
+        "Second Hand":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46099",
+        Tread:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46115",
+        Canfield:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46036",
+        "Walkaround Time":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46121",
+        RainForest:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46076",
+        Scramble:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46098",
+        Place:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46088",
+        "How to Pass, Kick, Fall and Run":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46043",
+        "Variations V":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46119",
+        "Cross Currents":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46055",
+        Events:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46123",
+        Winterbranch:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46113",
+        Story:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46106",
+        "Field Dances":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46064",
+        Aeon: "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46028",
+        Crises:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46039",
+        Rune: "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46095",
+        "Night Wandering":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46084",
+        Summerspace:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46033",
+        "Antic Meet":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46104",
+        Changeling:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46042",
+        Nocturnes:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46085",
+        "Lavish Escapade":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46075",
+        "Suite for Five":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46107",
+        Minutiae:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46080",
+        Septet:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46100",
+        Banjo:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46041",
+        "Dime a Dance":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46056",
+        Collage:
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46062",
+        "Sixteen Dances for Soloist and Company of Three":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46103",
+        "The Seasons":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46108",
+        "Root of an Unfocus":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46096",
+        "Totem Ancestor":
+          "https://dancecapsules.mercecunningham.org/overview.cfm?capid=46110",
+      };
+
       const card = document.getElementById("info-card");
 
       // Populate the info card with data for the selected spectacle
@@ -4621,6 +4807,12 @@
           s.location +
           "</div>";
         document.getElementById("card-meta").innerHTML = meta;
+        const capsuleUrl = s.capsule ? capsuleLinks[s.name] : null;
+        document.getElementById("card-capsule-link").innerHTML = s.capsule
+          ? '<div class="capsule-link"><a href="' +
+            (capsuleUrl || "https://dancecapsules.mercecunningham.org/") +
+            '" target="_blank" rel="noopener">View capsule page</a></div>'
+          : "";
         let collabs = "";
         if (s.music)
           collabs +=
