@@ -1,0 +1,4831 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Merce Cunningham 3D Spectacle Timeline · Complete 1938–2009</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        overflow: hidden;
+        background: #0a0a1a;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      #container {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      /* Info card styles: hidden by default, shown on hover or pin */
+      #info-card {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        background: rgba(10, 10, 30, 0.95);
+        border: 1px solid rgba(100, 180, 255, 0.4);
+        border-radius: 12px;
+        padding: 16px;
+        width: 400px;
+        max-height: 85vh;
+        color: #e0e8ff;
+        overflow-y: auto;
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.6),
+          0 0 15px rgba(100, 180, 255, 0.15);
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+      }
+      #info-card::-webkit-scrollbar {
+        width: 4px;
+      }
+      #info-card::-webkit-scrollbar-thumb {
+        background: #334;
+        border-radius: 2px;
+      }
+      #info-card.pinned {
+        pointer-events: auto;
+        border-color: rgba(255, 180, 60, 0.6);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.6),
+          0 0 20px rgba(255, 180, 60, 0.2);
+      }
+      #info-card .pin-bar {
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 180, 60, 0.2);
+      }
+      #info-card.pinned .pin-bar {
+        display: flex;
+      }
+      #info-card.pin-label {
+        font-size: 10px;
+        color: #ffb83c;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      #info-card.pin-close {
+        background: rgba(255, 100, 100, 0.2);
+        border: 1px solid rgba(255, 100, 100, 0.3);
+        color: #ff6a6a;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #info-card.pin-close:hover {
+        background: rgba(255, 100, 100, 0.4);
+      }
+      #info-card h3 {
+        margin: 0 0 4px 0;
+        font-size: 17px;
+        color: #7cb8ff;
+      }
+      #info-card.subtitle {
+        font-size: 12px;
+        color: #6a8ab0;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+      }
+      #info-card.meta-line {
+        font-size: 12px;
+        color: #a0b8d8;
+        margin-bottom: 3px;
+      }
+      #info-card.meta-line strong {
+        color: #c0d8f0;
+      }
+      #info-card.section-label {
+        font-size: 10px;
+        color: #5a7a9a;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 10px;
+        margin-bottom: 4px;
+      }
+      #info-card.cast-list {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #c0c8e0;
+      }
+      #info-card.cast-member {
+        display: inline-block;
+        padding: 1px 7px;
+        margin: 2px 3px 2px 0;
+        background: rgba(74, 158, 255, 0.1);
+        border: 1px solid rgba(74, 158, 255, 0.15);
+        border-radius: 10px;
+        font-size: 11px;
+        color: #90b8e0;
+      }
+      #info-card.cast-member.merce {
+        background: rgba(255, 204, 68, 0.15);
+        border-color: rgba(255, 204, 68, 0.3);
+        color: #ffcc44;
+        font-weight: 600;
+      }
+      #info-card.cast-count {
+        font-size: 11px;
+        color: #5a7a9a;
+        margin-top: 6px;
+        font-style: italic;
+      }
+      #info-card.collab-line {
+        font-size: 11px;
+        color: #8a9ab8;
+        margin-bottom: 2px;
+      }
+      #info-card.collab-line.role {
+        color: #5a7a9a;
+      }
+      #info-card.duration-badge {
+        display: inline-block;
+        background: rgba(74, 158, 255, 0.15);
+        border: 1px solid rgba(74, 158, 255, 0.2);
+        border-radius: 6px;
+        padding: 1px 8px;
+        font-size: 11px;
+        color: #7cb8ff;
+        margin-left: 6px;
+      }
+      #info-card.capsule-badge {
+        display: inline-block;
+        background: rgba(68, 221, 170, 0.15);
+        border: 1px solid rgba(68, 221, 170, 0.25);
+        border-radius: 6px;
+        padding: 1px 8px;
+        font-size: 11px;
+        color: #44ddaa;
+        margin-left: 4px;
+      }
+
+      /* Controls panel: filtering and reset UI */
+      #controls {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 100;
+        color: #8090b0;
+        font-size: 12px;
+        background: rgba(10, 10, 30, 0.9);
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(100, 180, 255, 0.15);
+        max-width: 260px;
+      }
+      #controls h2 {
+        color: #7cb8ff;
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      #controls p {
+        margin: 2px 0;
+      }
+
+      #filter-panel {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 100;
+        background: rgba(10, 10, 30, 0.92);
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(100, 180, 255, 0.15);
+        color: #8090b0;
+        font-size: 12px;
+        max-width: 300px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      #filter-panel::-webkit-scrollbar {
+        width: 5px;
+      }
+      #filter-panel::-webkit-scrollbar-thumb {
+        background: #334;
+        border-radius: 3px;
+      }
+      #filter-panel h3 {
+        color: #7cb8ff;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      #filter-panel.btn-row {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      #filter-panel button {
+        flex: 1;
+        padding: 6px 10px;
+        background: rgba(74, 158, 255, 0.15);
+        color: #7cb8ff;
+        border: 1px solid rgba(100, 180, 255, 0.25);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 11px;
+      }
+      #filter-panel button:hover {
+        background: rgba(74, 158, 255, 0.3);
+      }
+      #filter-panel.divider {
+        border: none;
+        border-top: 1px solid rgba(100, 180, 255, 0.12);
+        margin: 10px 0;
+      }
+      .range-group {
+        margin-bottom: 4px;
+      }
+      .range-group.range-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2px;
+      }
+      .range-group.range-value {
+        color: #7cb8ff;
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .range-group label {
+        margin: 0;
+        color: #a0b0c8;
+        font-size: 11px;
+      }
+      .range-group input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 5px;
+        background: #141428;
+        border-radius: 3px;
+        outline: none;
+        border: 1px solid rgba(100, 180, 255, 0.15);
+      }
+      .range-group input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #4a9eff;
+        cursor: pointer;
+        border: 2px solid #7cb8ff;
+      }
+      .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        margin-bottom: 3px;
+        color: #a0b0c8;
+        font-size: 11px;
+      }
+      .checkbox-group input[type="checkbox"] {
+        accent-color: #4a9eff;
+        width: 13px;
+        height: 13px;
+      }
+      .filter-stats {
+        font-size: 11px;
+        color: #5a7a9a;
+        margin-top: 6px;
+        line-height: 1.4;
+      }
+
+      #legend {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 100;
+        color: #8090b0;
+        font-size: 10px;
+        background: rgba(10, 10, 30, 0.8);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(100, 180, 255, 0.15);
+      }
+      .legend-row {
+        margin: 1px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <!-- Controls overlay: instructions and summary text -->
+    <div id="controls">
+      <h2>🎭 Cunningham Spectacles</h2>
+      <p style="font-size: 11px; color: #5a7a9a; margin-bottom: 6px">
+        Complete Timeline · 1938–2009
+      </p>
+      <p>🖱 Left-drag: rotate</p>
+      <p>🖱 Right-drag: pan · Scroll: zoom</p>
+      <p>Hover node → spectacle info</p>
+      <p><strong style="color: #ffb83c">Click</strong> to pin card</p>
+      <p style="margin-top: 4px; color: #5a7a9a; font-size: 11px">
+        Node size = cast size<br />Gold = Merce performing<br />Green ◆ =
+        Capsule piece
+      </p>
+    </div>
+    <!-- Filter panel: year, cast, and capsule controls -->
+    <div id="filter-panel">
+      <h3>📅 Year Range</h3>
+      <div class="range-group">
+        <div class="range-header">
+          <label>From:</label
+          ><span class="range-value" id="min-year-value">1938</span>
+        </div>
+        <input
+          type="range"
+          id="min-year-slider"
+          min="1938"
+          max="2009"
+          value="1938"
+        />
+      </div>
+      <div class="range-group">
+        <div class="range-header">
+          <label>To:</label
+          ><span class="range-value" id="max-year-value">2009</span>
+        </div>
+        <input
+          type="range"
+          id="max-year-slider"
+          min="1938"
+          max="2009"
+          value="2009"
+        />
+      </div>
+      <hr class="divider" />
+      <h3>🎯 Cast Filter</h3>
+      <div class="checkbox-group">
+        <label
+          ><input type="checkbox" id="filter-merce" checked /> Merce in
+          cast</label
+        >
+        <label
+          ><input type="checkbox" id="filter-no-merce" checked /> Without
+          Merce</label
+        >
+        <label
+          ><input type="checkbox" id="filter-capsule-only" /> Capsule pieces
+          only</label
+        >
+      </div>
+      <hr class="divider" />
+      <h3>📊 Cast Size</h3>
+      <div class="range-group">
+        <div class="range-header">
+          <label>Min:</label
+          ><span class="range-value" id="min-cast-value">0</span>
+        </div>
+        <input type="range" id="min-cast-slider" min="0" max="30" value="0" />
+      </div>
+      <div class="range-group">
+        <div class="range-header">
+          <label>Max:</label
+          ><span class="range-value" id="max-cast-value">30</span>
+        </div>
+        <input type="range" id="max-cast-slider" min="0" max="30" value="30" />
+      </div>
+      <div class="btn-row"><button id="btn-reset">Reset All</button></div>
+      <div class="filter-stats" id="filter-stats"></div>
+    </div>
+    <!-- Legend: visual key for node colors and pin behavior -->
+    <div id="legend">
+      <div class="legend-row">
+        <span style="color: #ffcc44">●</span> Merce in cast
+      </div>
+      <div class="legend-row">
+        <span style="color: #4a9eff">●</span> Without Merce
+      </div>
+      <div class="legend-row">
+        <span style="color: #44ddaa">◆</span> Capsule piece
+      </div>
+      <div class="legend-row">
+        <span style="color: #ff6a6a">●</span> Hovered/pinned
+      </div>
+      <div class="legend-row" style="color: #607090">Size = cast size</div>
+      <div class="legend-row">
+        <span style="color: #ffb83c">📌</span> Click to pin
+      </div>
+    </div>
+    <!-- Info card: displays details for the currently hovered or pinned spectacle -->
+    <div id="info-card">
+      <div class="pin-bar">
+        <span class="pin-label">📌 Pinned</span
+        ><button class="pin-close" id="pin-close">✕ Close</button>
+      </div>
+      <h3 id="card-name"></h3>
+      <div class="subtitle" id="card-subtitle"></div>
+      <div id="card-meta"></div>
+      <div id="card-collabs"></div>
+      <div class="section-label" id="card-cast-label">ORIGINAL CAST</div>
+      <div class="cast-list" id="card-cast"></div>
+      <div class="cast-count" id="card-cast-count"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+      const spectacles = [
+        {
+          name: "Unbalanced March",
+          year: 1938,
+          date: "30/11/38",
+          location: "Elks' Club, Seattle",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Paul Hindemith",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Jazz Epigram",
+          year: 1938,
+          date: "30/11/38",
+          location: "Elks' Club, Seattle",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Ernst Toch",
+          cast: ["Merce Cunningham", "Dorothy Herrmann"],
+        },
+        {
+          name: "Skinny Structures",
+          year: 1939,
+          date: "24/03/39",
+          location: "Cornish Theatre, Seattle",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Alfredo Casella, Darius Milhaud, Jean Wiener, Felix Petyrek",
+          cast: ["Merce Cunningham", "Syvilla Fort", "Dorothy Herrmann"],
+        },
+        {
+          name: "Courante",
+          year: 1939,
+          date: "10/08/39",
+          location: "Mills College, Oakland",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Zoe Williams",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Renaissance Testimonials",
+          year: 1942,
+          date: "01/08/42",
+          location: "Bennington College",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "Charlotte Trowbridge",
+          lighting: "",
+          music: "Maxwell Powers",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Seeds of Brightness",
+          year: 1942,
+          date: "01/08/42",
+          location: "Bennington College",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Charlotte Trowbridge",
+          lighting: "",
+          music: "Norman Lloyd",
+          cast: ["Merce Cunningham", "Jean Erdman"],
+        },
+        {
+          name: "Credo in Us",
+          year: 1942,
+          date: "01/08/42",
+          location: "Bennington College",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Charlotte Trowbridge",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Jean Erdman"],
+        },
+        {
+          name: "Ad Lib",
+          year: 1942,
+          date: "01/08/42",
+          location: "Bennington College",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Charlotte Trowbridge",
+          lighting: "",
+          music: "Gregory Tucker, John Cage",
+          cast: ["Merce Cunningham", "Jean Erdman"],
+        },
+        {
+          name: "Totem Ancestor",
+          year: 1942,
+          date: "20/10/42",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:03:00",
+          capsule: true,
+          decor: "",
+          costumes: "Charlotte Trowbridge",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "In the Name of the Holocaust",
+          year: 1943,
+          date: "14/02/43",
+          location: "Arts Club of Chicago",
+          duration: "00:06:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Shimmera",
+          year: 1943,
+          date: "14/02/43",
+          location: "Arts Club of Chicago",
+          duration: "00:10:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Triple-Paced",
+          year: 1944,
+          date: "05/04/44",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Root of an Unfocus",
+          year: 1944,
+          date: "05/04/44",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:07:00",
+          capsule: true,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Tossed As It Is Untroubled",
+          year: 1944,
+          date: "05/04/44",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:02:30",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "The Unavailable Memory Of",
+          year: 1944,
+          date: "05/04/44",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:02:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Spontaneous Earth",
+          year: 1944,
+          date: "05/04/44",
+          location: "Humphrey-Weidman Studio Theatre, NYC",
+          duration: "00:03:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Four Walls",
+          year: 1944,
+          date: "22/08/44",
+          location: "Perry-Mansfield Workshop, Steamboat Springs",
+          duration: "01:00:00",
+          capsule: false,
+          decor: "Arch Lauterer",
+          costumes: "Arch Lauterer",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Patricia Birch",
+            "Marlise Bok",
+            "Jean Cummings",
+            "Merce Cunningham",
+            "Leora Dana",
+            "Joan Frederiksen",
+            "Julie Harris",
+            "Betty Koerber",
+            "Connie Kuhni",
+            "George Lang",
+            "Patricia Lawrence",
+            "Fawn Pickett",
+            "Stanton Schumutz",
+            "Vivian Steinberg",
+            "Virginia Tanner",
+            "Martha Hindle",
+          ],
+        },
+        {
+          name: "Idyllic Song",
+          year: 1944,
+          date: "20/11/44",
+          location: "Women's Club, Richmond",
+          duration: "00:06:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Erik Satie",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Experiences",
+          year: 1945,
+          date: "09/01/45",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:04:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Livingston Gearhart, John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Mysterious Adventure",
+          year: 1945,
+          date: "09/01/45",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "David Hare",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Soliloquy",
+          year: 1945,
+          date: "09/01/45",
+          location: "Hunter Playhouse, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "The Encounter",
+          year: 1946,
+          date: "12/05/46",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Invocation to Vahakn",
+          year: 1946,
+          date: "12/05/46",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:06:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Alan Hovhaness",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Fast Blues",
+          year: 1946,
+          date: "12/05/46",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Baby Dodds",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "The Princess Zondilda",
+          year: 1946,
+          date: "12/05/46",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:10:00",
+          capsule: false,
+          decor: "Merce Cunningham",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Alexei Haieff",
+          cast: ["Virginia Bosler", "Merce Cunningham", "Katherine Litz"],
+        },
+        {
+          name: "The Seasons",
+          year: 1947,
+          date: "18/05/47",
+          location: "Ziegfeld Theater, NYC",
+          duration: "00:18:00",
+          capsule: true,
+          decor: "Isamu Noguchi",
+          costumes: "Isamu Noguchi",
+          lighting: "Isamu Noguchi",
+          music: "John Cage",
+          cast: [
+            "Gisella Cacialanza",
+            "Merce Cunningham",
+            "Fred Danieli",
+            "Dorothy Dushock",
+            "Gerard Leavit",
+            "Tanaquil LeClerq",
+            "Job Sanders",
+            "Beatrice Tompkins",
+          ],
+        },
+        {
+          name: "The Open Road",
+          year: 1947,
+          date: "14/12/47",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:04:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Lou Harrison",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Dromenon",
+          year: 1947,
+          date: "14/12/47",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:20:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham, Sonja Sekula",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Dorothy Berea",
+            "Shirley Broughton",
+            "Mili Churchill",
+            "Merce Cunningham",
+            "Eleanor Goff",
+            "Sara Hamill",
+            "Judith Martin",
+          ],
+        },
+        {
+          name: "Dream",
+          year: 1948,
+          date: "08/05/48",
+          location: "Stephens College, Columbia",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "The Ruse of Medusa",
+          year: 1948,
+          date: "14/08/48",
+          location: "Black Mountain College",
+          duration: "",
+          capsule: false,
+          decor: "Willem de Kooning, Elaine de Kooning",
+          costumes:
+            "Ruth Asawa, Buckminster Fuller, Bruce Johns, Ray Johnson, Albert Lanier, Mary Outten, Raymond Spillenger, Forrest Wright",
+          lighting: "",
+          music: "Erik Satie",
+          cast: [
+            "Alvin Charles Few",
+            "Merce Cunningham",
+            "Elaine De Kooning",
+            "Buckminster Fuller",
+            "Isaac Rosenfeld",
+            "William Shrauger",
+          ],
+        },
+        {
+          name: "A Diversion",
+          year: 1948,
+          date: "20/08/48",
+          location: "Black Mountain College",
+          duration: "00:08:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham, Mary Outten",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Sara Hamill", "Louise Lippold"],
+        },
+        {
+          name: "Orestes",
+          year: 1948,
+          date: "20/08/48",
+          location: "Black Mountain College",
+          duration: "00:10:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "The Monkey Dances",
+          year: 1948,
+          date: "20/08/48",
+          location: "Black Mountain College",
+          duration: "00:26:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Erik Satie",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Effusions avant l'heure",
+          year: 1949,
+          date: "10/06/49",
+          location: "Jean Hélion's Studio, Paris",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Tanaquil LeClerq", "Betty Nichols"],
+        },
+        {
+          name: "Amores",
+          year: 1949,
+          date: "10/06/49",
+          location: "Jean Hélion's Studio, Paris",
+          duration: "00:09:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Tanaquil LeClerq"],
+        },
+        {
+          name: "Duet",
+          year: 1949,
+          date: "29/06/49",
+          location: "Paris, France",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Léonor Fini",
+          lighting: "",
+          music: "",
+          cast: ["Milorad Miskovitch", "Betty Nichols"],
+        },
+        {
+          name: "Two-Step",
+          year: 1949,
+          date: "18/12/49",
+          location: "City Center Theater, NYC",
+          duration: "00:02:34",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Erik Satie",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Pool of Darkness",
+          year: 1950,
+          date: "15/01/50",
+          location: "Hunter Playhouse, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Ben Weber",
+          cast: [
+            "Dorothy Berea",
+            "Mili Churchill",
+            "Merce Cunningham",
+            "Anneliese Widman",
+          ],
+        },
+        {
+          name: "Before Dawn",
+          year: 1950,
+          date: "15/01/50",
+          location: "Hunter Playhouse, NYC",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Waltz",
+          year: 1950,
+          date: "24/11/50",
+          location: "Cooper Union, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Erik Satie",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Rag-Time Parade",
+          year: 1950,
+          date: "24/11/50",
+          location: "Cooper Union, NYC",
+          duration: "00:17:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Erik Satie",
+          cast: [
+            "Sudie Bond",
+            "François Canton",
+            "Remy Charlip",
+            "Marianne Preger-Simon",
+            "Rachel Rosenthal",
+            "Julie Walter",
+          ],
+        },
+        {
+          name: "Sixteen Dances",
+          year: 1951,
+          date: "17/01/51",
+          location: "Bennett Junior College, Millbrook",
+          duration: "00:53:00",
+          capsule: true,
+          decor: "",
+          costumes:
+            "John Cage, Remy Charlip, Merce Cunningham, Eleanor de Vito",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Dorothy Berea",
+            "Mili Churchill",
+            "Merce Cunningham",
+            "Anneliese Widman",
+          ],
+        },
+        {
+          name: "Variation",
+          year: 1951,
+          date: "12/04/51",
+          location: "University of Washington, Seattle",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Morton Feldman",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Boy Who Wanted to Be a Bird",
+          year: 1951,
+          date: "30/06/51",
+          location: "Martha's Vineyard, MA",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Suite of Six Short Dances",
+          year: 1952,
+          date: "10/03/52",
+          location: "Black Mountain College",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "W.P. Jennerjahn",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Les Noces",
+          year: 1952,
+          date: "14/06/52",
+          location: "Brandeis University, Waltham",
+          duration: "00:23:00",
+          capsule: false,
+          decor: "Howard Bay",
+          costumes: "Howard Bay",
+          lighting: "",
+          music: "Igor Stravinsky",
+          cast: [
+            "Ronne Aul",
+            "Phyllis Backer",
+            "Helaine Berley",
+            "Adelaide Case",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Ben Garber",
+            "Donald McKayle",
+            "Jo Anne Melsher",
+            "Natanya Neumann",
+            "Marianne Preger-Simon",
+            "Joan Skinner",
+            "Naima Wallenrod",
+            "Anneliese Widman",
+          ],
+        },
+        {
+          name: "Collage",
+          year: 1952,
+          date: "14/06/52",
+          location: "Brandeis University, Waltham",
+          duration: "",
+          capsule: true,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Pierre Schaeffer",
+          cast: [
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Joanne Finkelor",
+            "Ben Garber",
+            "Donald McKayle",
+            "Jo Anne Melsher",
+            "Natanya Neumann",
+            "Marianne Preger-Simon",
+            "Greta Rosenzweig",
+            "Anneliese Widman",
+          ],
+        },
+        {
+          name: "Theatre Piece",
+          year: 1952,
+          date: "30/06/52",
+          location: "Black Mountain College",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Brigadoon",
+          year: 1952,
+          date: "15/08/52",
+          location: "Parkway Playhouse, Burnsville",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Suite by Chance",
+          year: 1953,
+          date: "24/03/53",
+          location: "University of Illinois, Urbana",
+          duration: "00:24:00",
+          capsule: false,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Christian Wolff",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Jo Anne Melsher",
+            "Natanya Neumann",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Solo Suite in Space and Time",
+          year: 1953,
+          date: "23/06/53",
+          location: "Louisiana State University, Baton Rouge",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Demonstration Piece",
+          year: 1953,
+          date: "23/06/53",
+          location: "Louisiana State University, Baton Rouge",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: [
+            "Barbara Brown",
+            "Dorcas Brown",
+            "Bobbie Chachere",
+            "Alida Dureau",
+            "Sybill Gaines",
+            "Sonya LeBlanc",
+            "Katie Planche Freidrichs",
+          ],
+        },
+        {
+          name: "Epilogue",
+          year: 1953,
+          date: "23/06/53",
+          location: "Louisiana State University, Baton Rouge",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Erik Satie",
+          cast: [
+            "Barbara Brown",
+            "Dorcas Brown",
+            "Bobbie Chachere",
+            "Alida Dureau",
+            "Sybill Gaines",
+            "Sonya LeBlanc",
+            "Katie Planche Freidrichs",
+          ],
+        },
+        {
+          name: "Banjo",
+          year: 1953,
+          date: "21/08/53",
+          location: "Black Mountain College",
+          duration: "00:15:00",
+          capsule: true,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Louis Moreau Gottschalk",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Jo Anne Melsher",
+            "Paul Taylor",
+          ],
+        },
+        {
+          name: "Dime a Dance",
+          year: 1953,
+          date: "21/08/53",
+          location: "Black Mountain College",
+          duration: "",
+          capsule: true,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "Remy Charlip",
+          music: "David Tudor",
+          cast: [
+            "Ethel Brodsky",
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Anita Dencks",
+            "Viola Farber",
+            "Timothy LaFarge",
+            "Deborah Moscowitz",
+            "Paul Taylor",
+          ],
+        },
+        {
+          name: "Septet",
+          year: 1953,
+          date: "22/08/53",
+          location: "Black Mountain College",
+          duration: "00:16:00",
+          capsule: true,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Erik Satie",
+          cast: [
+            "Jo Anne Melsher",
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Anita Dencks",
+            "Viola Farber",
+            "Paul Taylor",
+          ],
+        },
+        {
+          name: "Untitled Solo",
+          year: 1953,
+          date: "22/08/53",
+          location: "Black Mountain College",
+          duration: "00:05:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Christian Wolff",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Fragments",
+          year: 1953,
+          date: "30/12/53",
+          location: "Theater de Lys, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Pierre Boulez",
+          cast: [
+            "Remy Charlip",
+            "Jo Anne Melsher",
+            "Anita Dencks",
+            "Marianne Preger-Simon",
+            "Merce Cunningham",
+            "Carolyn Brown",
+            "Paul Taylor",
+          ],
+        },
+        {
+          name: "Minutiae",
+          year: 1954,
+          date: "08/12/54",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:16:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Anita Dencks",
+            "Viola Farber",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Springweather and People",
+          year: 1955,
+          date: "24/05/55",
+          location: "Bard College, Annandale-on-Hudson",
+          duration: "00:33:00",
+          capsule: false,
+          decor: "",
+          costumes: "Remy Charlip, Robert Rauschenberg",
+          lighting: "",
+          music: "Earle Brown",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Anita Dencks",
+            "Viola Farber",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Galaxy",
+          year: 1956,
+          date: "18/05/56",
+          location: "University of Notre Dame, South Bend",
+          duration: "00:07:30",
+          capsule: false,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Earle Brown",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Viola Farber",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Lavish Escapade",
+          year: 1956,
+          date: "18/05/56",
+          location: "University of Notre Dame, South Bend",
+          duration: "",
+          capsule: true,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "Christian Wolff",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Suite for Five",
+          year: 1956,
+          date: "18/05/56",
+          location: "University of Notre Dame, South Bend",
+          duration: "00:23:00",
+          capsule: true,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "Beverly Emmons",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Remy Charlip",
+            "Viola Farber",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Nocturnes",
+          year: 1956,
+          date: "11/07/56",
+          location: "Jacob's Pillow, MA",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Erik Satie",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Bruce King",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Labyrinthian Dances",
+          year: 1957,
+          date: "30/11/57",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "",
+          capsule: false,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Josef Matthias Hauer",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Bruce King",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Changeling",
+          year: 1957,
+          date: "30/11/57",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "",
+          capsule: true,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "Robert Rauschenberg",
+          music: "Christian Wolff",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Picnic Polka",
+          year: 1957,
+          date: "30/11/57",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Remy Charlip",
+          lighting: "",
+          music: "Louis Moreau Gottschalk",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Bruce King",
+            "Marianne Preger-Simon",
+          ],
+        },
+        {
+          name: "Antic Meet",
+          year: 1958,
+          date: "14/08/58",
+          location: "American Dance Festival, New London",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Cynthia Stone",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Summerspace",
+          year: 1958,
+          date: "17/08/58",
+          location: "American Dance Festival, New London",
+          duration: "00:15:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "Aaron Copp",
+          music: "Morton Feldman",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Cynthia Stone",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Night Wandering",
+          year: 1958,
+          date: "05/10/58",
+          location: "Kungl Teatern, Stockholm",
+          duration: "00:13:00",
+          capsule: true,
+          decor: "",
+          costumes: "Nicola Cernovich, Robert Rauschenberg",
+          lighting: "Nicola Cernovich, Beverly Emmons",
+          music: "Bo Nilsson",
+          cast: ["Carolyn Brown", "Merce Cunningham"],
+        },
+        {
+          name: "From the Poems of White Stone",
+          year: 1959,
+          date: "04/03/59",
+          location: "University of Illinois, Urbana",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Chou Wen-Chung",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Judith Dunn",
+            "Viola Farber",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Gambit for Dancers and Orchestra",
+          year: 1959,
+          date: "04/03/59",
+          location: "University of Illinois, Urbana",
+          duration: "00:17:00",
+          capsule: false,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Ben Johnston",
+          cast: [
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Judith Dunn",
+            "Viola Farber",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Rune",
+          year: 1959,
+          date: "14/08/59",
+          location: "American Dance Festival, New London",
+          duration: "00:25:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "Robert Rauschenberg",
+          music: "Christian Wolff",
+          cast: [
+            "Merce Cunningham",
+            "Remy Charlip",
+            "Carolyn Brown",
+            "Judith Dunn",
+            "Viola Farber",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Theater Piece (1960)",
+          year: 1960,
+          date: "07/03/60",
+          location: "Circle in the Square, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Carolyn Brown"],
+        },
+        {
+          name: "Crises",
+          year: 1960,
+          date: "19/08/60",
+          location: "American Dance Festival, New London",
+          duration: "00:22:00",
+          capsule: true,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Conlon Nancarrow",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Judith Dunn",
+            "Viola Farber",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Hands Birds",
+          year: 1960,
+          date: "24/09/60",
+          location: "Teatro la Fenice, Venice",
+          duration: "00:16:50",
+          capsule: false,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Earle Brown",
+          cast: ["Carolyn Brown"],
+        },
+        {
+          name: "Waka",
+          year: 1960,
+          date: "24/09/60",
+          location: "Teatro la Fenice, Venice",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Toshi Ichiyanagi",
+          cast: ["Carolyn Brown"],
+        },
+        {
+          name: "Music Walk with Dancers",
+          year: 1960,
+          date: "24/09/60",
+          location: "Teatro la Fenice, Venice",
+          duration: "00:10:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham", "Carolyn Brown"],
+        },
+        {
+          name: "Aeon",
+          year: 1961,
+          date: "05/08/61",
+          location: "Comédie Canadienne, Montreal",
+          duration: "00:45:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Shareen Blair",
+            "Carolyn Brown",
+            "Remy Charlip",
+            "Merce Cunningham",
+            "Judith Dunn",
+            "Viola Farber",
+            "Steve Paxton",
+            "Valda Setterfield",
+            "Marilyn Wood",
+          ],
+        },
+        {
+          name: "Field Dances",
+          year: 1963,
+          date: "17/07/63",
+          location: "University of California, Los Angeles",
+          duration: "00:12:00",
+          capsule: true,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "Beverly Emmons",
+          music: "John Cage",
+          cast: [
+            "Shareen Blair",
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Viola Farber",
+          ],
+        },
+        {
+          name: "Story",
+          year: 1963,
+          date: "24/07/63",
+          location: "University of California, Los Angeles",
+          duration: "00:27:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "Toshi Ichiyanagi",
+          cast: [
+            "Shareen Blair",
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "William Davies",
+            "Viola Farber",
+            "Barbara Lloyd",
+            "Steve Paxton",
+          ],
+        },
+        {
+          name: "Open Session",
+          year: 1964,
+          date: "19/03/64",
+          location: "Wadsworth Atheneum, Hartford",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "",
+          music: "",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Paired",
+          year: 1964,
+          date: "21/03/64",
+          location: "Wadsworth Atheneum, Hartford",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Shareen Blair",
+            "Merce Cunningham",
+            "William Davies",
+            "Viola Farber",
+            "Deborah Hay",
+            "Barbara Lloyd",
+            "Sandra Neels",
+          ],
+        },
+        {
+          name: "Winterbranch",
+          year: 1964,
+          date: "21/03/64",
+          location: "Wadsworth Atheneum, Hartford",
+          duration: "00:23:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "Robert Rauschenberg",
+          music: "La Monte Young",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "William Davies",
+            "Viola Farber",
+            "Barbara Lloyd",
+            "Steve Paxton",
+          ],
+        },
+        {
+          name: "Museum Event No. 1",
+          year: 1964,
+          date: "24/06/64",
+          location: "Museum des 20. Jahrhunderts, Vienna",
+          duration: "01:15:00",
+          capsule: true,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Merce Cunningham",
+            "Shareen Blair",
+            "Carolyn Brown",
+            "William Davies",
+            "Viola Farber",
+            "Deborah Hay",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Steve Paxton",
+            "Albert Reid",
+          ],
+        },
+        {
+          name: "Cross Currents",
+          year: 1964,
+          date: "31/07/64",
+          location: "Sadler's Wells Theatre, London",
+          duration: "00:07:00",
+          capsule: true,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "Robert Rauschenberg",
+          music: "Conlon Nancarrow",
+          cast: ["Carolyn Brown", "Merce Cunningham", "Viola Farber"],
+        },
+        {
+          name: "Variations V",
+          year: 1965,
+          date: "23/07/65",
+          location: "Lincoln Center, NYC",
+          duration: "00:45:00",
+          capsule: true,
+          decor: "Nam June Paik, Stan VanDerBeek",
+          costumes: "",
+          lighting: "Beverly Emmons",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Viola Farber",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Peter Saul",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "How to Pass, Kick, Fall and Run",
+          year: 1965,
+          date: "24/11/65",
+          location: "Harper Theater, Chicago",
+          duration: "00:23:00",
+          capsule: true,
+          decor: "",
+          costumes: "",
+          lighting: "Beverly Emmons",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Peter Saul",
+            "Valda Setterfield",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "Place",
+          year: 1966,
+          date: "06/08/66",
+          location: "Fondation Maeght, Saint-Paul-de-Vence",
+          duration: "",
+          capsule: true,
+          decor: "Beverly Emmons",
+          costumes: "",
+          lighting: "",
+          music: "Gordon Mumma",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Peter Saul",
+            "Valda Setterfield",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "Scramble",
+          year: 1967,
+          date: "25/07/67",
+          location: "Ravinia Festival, Chicago",
+          duration: "00:23:00",
+          capsule: true,
+          decor: "Frank Stella",
+          costumes: "Frank Stella",
+          lighting: "Beverly Emmons",
+          music: "Toshi Ichiyanagi",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Yseult Riopelle",
+            "Valda Setterfield",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "RainForest",
+          year: 1968,
+          date: "03/09/68",
+          location: "Buffalo State College, NY",
+          duration: "00:18:00",
+          capsule: true,
+          decor: "Andy Warhol",
+          costumes: "Jasper Johns",
+          lighting: "",
+          music: "David Tudor",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "Walkaround Time",
+          year: 1968,
+          date: "10/03/68",
+          location: "SUNY Buffalo",
+          duration: "00:50:00",
+          capsule: true,
+          decor: "Marcel Duchamp, Jasper Johns",
+          costumes: "Jasper Johns",
+          lighting: "Beverly Emmons",
+          music: "David Behrman",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Barbara Lloyd",
+            "Sandra Neels",
+            "Albert Reid",
+            "Valda Setterfield",
+            "Gus Solomons jr",
+          ],
+        },
+        {
+          name: "Assemblage",
+          year: 1968,
+          date: "03/11/68",
+          location: "KQED-TV, San Francisco",
+          duration: "00:59:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage, David Tudor, Gordon Mumma",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Sandra Neels",
+            "Chase Robinson",
+            "Valda Setterfield",
+            "Jeff Slayton",
+            "Mel Wong",
+          ],
+        },
+        {
+          name: "Canfield",
+          year: 1969,
+          date: "04/03/69",
+          location: "Nazareth College, Rochester",
+          duration: "00:20:00",
+          capsule: true,
+          decor: "Robert Morris",
+          costumes: "Jasper Johns",
+          lighting: "",
+          music: "Pauline Oliveros",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Sandra Neels",
+            "Chase Robinson",
+            "Valda Setterfield",
+            "Jeff Slayton",
+            "Mel Wong",
+          ],
+        },
+        {
+          name: "Tread",
+          year: 1970,
+          date: "05/01/70",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:20:00",
+          capsule: true,
+          decor: "Bruce Nauman",
+          costumes: "Merce Cunningham",
+          lighting: "Richard Nelson",
+          music: "Christian Wolff",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Douglas Dunn",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Sandra Neels",
+            "Chase Robinson",
+            "Valda Setterfield",
+            "Jeff Slayton",
+            "Mel Wong",
+          ],
+        },
+        {
+          name: "Second Hand",
+          year: 1970,
+          date: "08/01/70",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "",
+          costumes: "Jasper Johns",
+          lighting: "Richard Nelson",
+          music: "John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Douglas Dunn",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Sandra Neels",
+            "Chase Robinson",
+            "Valda Setterfield",
+            "Jeff Slayton",
+            "Mel Wong",
+          ],
+        },
+        {
+          name: "Signals",
+          year: 1970,
+          date: "05/06/70",
+          location: "Théâtre de France, Paris",
+          duration: "00:20:00",
+          capsule: true,
+          decor: "",
+          costumes: "Merce Cunningham",
+          lighting: "Richard Nelson",
+          music: "John Cage, Gordon Mumma, David Tudor",
+          cast: [
+            "Louise Burns",
+            "Merce Cunningham",
+            "Douglas Dunn",
+            "Susana Hayman-Chaffey",
+            "Valda Setterfield",
+            "Mel Wong",
+          ],
+        },
+        {
+          name: "Objects",
+          year: 1970,
+          date: "10/11/70",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:32:00",
+          capsule: false,
+          decor: "Neil Jenney",
+          costumes: "",
+          lighting: "",
+          music: "Alvin Lucier",
+          cast: [
+            "Carolyn Brown",
+            "Louise Burns",
+            "Merce Cunningham",
+            "Ulysses Dove",
+            "Douglas Dunn",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Sandra Neels",
+            "Chase Robinson",
+          ],
+        },
+        {
+          name: "Loops",
+          year: 1971,
+          date: "03/11/71",
+          location: "Museum of Modern Art, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Gordon Mumma",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Landrover",
+          year: 1972,
+          date: "01/02/72",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:52:00",
+          capsule: true,
+          decor: "",
+          costumes: "Jasper Johns",
+          lighting: "Richard Nelson",
+          music: "Gordon Mumma, David Tudor, John Cage",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Ulysses Dove",
+            "Douglas Dunn",
+            "Meg Harper",
+            "Nanette Hassall",
+            "Susana Hayman-Chaffey",
+            "Chris Komar",
+            "Sandra Neels",
+            "Chase Robinson",
+            "Valda Setterfield",
+          ],
+        },
+        {
+          name: "TV Rerun",
+          year: 1972,
+          date: "02/02/72",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:27:00",
+          capsule: true,
+          decor: "Jasper Johns",
+          costumes: "Jasper Johns",
+          lighting: "Richard Nelson",
+          music: "Gordon Mumma",
+          cast: [
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Ulysses Dove",
+            "Douglas Dunn",
+            "Meg Harper",
+            "Nanette Hassall",
+            "Chris Komar",
+            "Sandra Neels",
+            "Valda Setterfield",
+          ],
+        },
+        {
+          name: "Borst Park",
+          year: 1972,
+          date: "08/02/72",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:32:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "Christian Wolff",
+          cast: [
+            "Merce Cunningham",
+            "Ulysses Dove",
+            "Meg Harper",
+            "Nanette Hassall",
+            "Chris Komar",
+            "Sandra Neels",
+          ],
+        },
+        {
+          name: "Changing Steps",
+          year: 1973,
+          date: "22/03/73",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "",
+          costumes: "Charles Atlas",
+          lighting: "Charles Atlas",
+          music: "John Cage",
+          cast: [
+            "Douglas Dunn",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Chris Komar",
+            "Robert Kovich",
+            "Barbara Lias",
+            "Brynar Mehl",
+            "Sandra Neels",
+            "Julie Roess-Smith",
+            "Valda Setterfield",
+          ],
+        },
+        {
+          name: "Un jour ou deux",
+          year: 1973,
+          date: "06/11/73",
+          location: "Opéra de Paris",
+          duration: "01:30:00",
+          capsule: true,
+          decor: "",
+          costumes: "Jasper Johns",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Francoise Ambriere",
+            "Claude Ariel",
+            "Michele Baude",
+            "Michel Berges",
+            "Anny Carbonnel",
+            "Josyanne Consoli",
+            "Alain Debrus",
+            "Michael Denard",
+            "Marie-Claude Dubus",
+            "Philippe Gerbet",
+            "Jean-Paul Gravier",
+            "Jean Guizerix",
+            "Colette Hauleux",
+            "Vladimir Huot",
+            "Danielle Joly",
+            "Charles Jude",
+            "Jeanine Julien",
+            "Gerard Lignon",
+            "Francis Malovik",
+            "Thierry Mongne",
+            "Wilfride Piollet",
+            "Chantal Quarrez",
+            "Laure Renaudel",
+            "Jessica Sordoillet",
+            "Pascal Vernier",
+            "Pascal Vincent",
+          ],
+        },
+        {
+          name: "Westbeth",
+          year: 1974,
+          date: "14/02/74",
+          location: "Merce Cunningham Studio, NYC",
+          duration: "00:32:00",
+          capsule: false,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Karen Attix",
+            "Ellen Cornfield",
+            "Meg Harper",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Brynar Mehl",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+            "Valda Setterfield",
+            "George Titus",
+          ],
+        },
+        {
+          name: "Exercise Piece I",
+          year: 1975,
+          date: "14/02/75",
+          location: "Merce Cunningham Studio, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: [
+            "Karen Attix",
+            "Meg Harper",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Charles Moulton",
+            "Valda Setterfield",
+            "Julie Roess-Smith",
+            "Robert Kovich",
+            "Ellen Cornfield",
+          ],
+        },
+        {
+          name: "Rebus",
+          year: 1975,
+          date: "07/03/75",
+          location: "Music Hall, Detroit",
+          duration: "00:31:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "",
+          cast: [
+            "Karen Attix",
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Brynar Mehl",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+          ],
+        },
+        {
+          name: "Sounddance",
+          year: 1975,
+          date: "08/03/75",
+          location: "Music Hall, Detroit",
+          duration: "00:17:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "David Tudor",
+          cast: [
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Brynar Mehl",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+          ],
+        },
+        {
+          name: "Solo",
+          year: 1975,
+          date: "08/03/75",
+          location: "Music Hall, Detroit",
+          duration: "00:10:00",
+          capsule: false,
+          decor: "",
+          costumes: "Sonja Sekula",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Torse",
+          year: 1976,
+          date: "15/01/76",
+          location: "McCarter Theatre, Princeton",
+          duration: "00:55:00",
+          capsule: true,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "Maryanne Amacher",
+          cast: [
+            "Karen Attix",
+            "Ellen Cornfield",
+            "Morgan Ensminger",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+          ],
+        },
+        {
+          name: "Squaregame",
+          year: 1976,
+          date: "24/03/76",
+          location: "Festival Theatre, Adelaide",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Karole Armitage",
+            "Karen Attix",
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Morgan Ensminger",
+            "Meg Harper",
+            "Susana Hayman-Chaffey",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Raymond Kurshals",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+          ],
+        },
+        {
+          name: "Travelogue",
+          year: 1977,
+          date: "18/01/77",
+          location: "Minskoff Theatre, NYC",
+          duration: "00:33:00",
+          capsule: false,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Karole Armitage",
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Morgan Ensminger",
+            "Meg Harper",
+            "Chris Komar",
+            "Robert Kovich",
+            "Julie Roess-Smith",
+          ],
+        },
+        {
+          name: "Inlets",
+          year: 1977,
+          date: "10/09/77",
+          location: "Cornish College, Seattle",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "Morris Graves",
+          costumes: "Morris Graves",
+          lighting: "Charles Atlas",
+          music: "John Cage",
+          cast: [
+            "Karole Armitage",
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Lisa Fox",
+            "Chris Komar",
+            "Robert Kovich",
+          ],
+        },
+        {
+          name: "Fractions",
+          year: 1978,
+          date: "26/02/78",
+          location: "Boston English High School",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Jon Gibson",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Meg Eginton",
+            "Lisa Fox",
+            "Chris Komar",
+            "Robert Kovich",
+            "Jim Self",
+          ],
+        },
+        {
+          name: "Exercise Piece II",
+          year: 1978,
+          date: "25/03/78",
+          location: "Roundabout Theatre, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: ["Meg Eginton", "Susan Emery", "Lise Friedman", "Rob Remley"],
+        },
+        {
+          name: "Exercise Piece III",
+          year: 1978,
+          date: "18/08/78",
+          location: "Royal Alexandra Theatre, Toronto",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Meg Eginton",
+            "Susan Emery",
+            "Lisa Fox",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Joseph Lennon",
+            "Rob Remley",
+            "Jim Self",
+          ],
+        },
+        {
+          name: "Exchange",
+          year: 1978,
+          date: "27/09/78",
+          location: "City Center Theater, NYC",
+          duration: "00:35:00",
+          capsule: true,
+          decor: "Jasper Johns",
+          costumes: "Jasper Johns",
+          lighting: "Charles Atlas",
+          music: "David Tudor",
+          cast: [
+            "Merce Cunningham",
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Meg Eginton",
+            "Susan Emery",
+            "Lisa Fox",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Joseph Lennon",
+            "Rob Remley",
+            "Jim Self",
+          ],
+        },
+        {
+          name: "Tango",
+          year: 1978,
+          date: "05/10/78",
+          location: "City Center Theater, NYC",
+          duration: "00:07:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Merce Cunningham"],
+        },
+        {
+          name: "Roadrunners",
+          year: 1979,
+          date: "19/08/79",
+          location: "Duke University, Durham",
+          duration: "00:22:00",
+          capsule: true,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Yasunao Tone",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Merce Cunningham",
+            "Meg Eginton",
+            "Susan Emery",
+            "Lisa Fox",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Joseph Lennon",
+            "Rob Remley",
+            "Jim Self",
+          ],
+        },
+        {
+          name: "Locale",
+          year: 1979,
+          date: "09/10/79",
+          location: "Théâtre de la Ville, Paris",
+          duration: "00:28:00",
+          capsule: true,
+          decor: "",
+          costumes: "Charles Atlas",
+          lighting: "Charles Atlas",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Meg Eginton",
+            "Susan Emery",
+            "Lisa Fox",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Joseph Lennon",
+            "Rob Remley",
+            "Jim Self",
+          ],
+        },
+        {
+          name: "Exercise Piece IV",
+          year: 1980,
+          date: "23/02/80",
+          location: "Merce Cunningham Studio, NYC",
+          duration: "",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: [
+            "Karen Attix",
+            "Ellen Cornfield",
+            "Meg Harper",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Charles Moulton",
+            "Julie Roess-Smith",
+            "Valda Setterfield",
+          ],
+        },
+        {
+          name: "Duets",
+          year: 1980,
+          date: "26/02/80",
+          location: "City Center Theater, NYC",
+          duration: "00:16:00",
+          capsule: true,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "John Cage",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Merce Cunningham",
+            "Meg Eginton",
+            "Susan Emery",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Robert Kovich",
+            "Joseph Lennon",
+            "Rob Remley",
+          ],
+        },
+        {
+          name: "Fielding Sixes",
+          year: 1980,
+          date: "30/06/80",
+          location: "University of California, Los Angeles",
+          duration: "00:12:00",
+          capsule: true,
+          decor: "",
+          costumes: "Robert Rauschenberg",
+          lighting: "Robert Rauschenberg",
+          music: "John Cage",
+          cast: [
+            "Shareen Blair",
+            "Carolyn Brown",
+            "Merce Cunningham",
+            "Viola Farber",
+          ],
+        },
+        {
+          name: "10's with Shoes",
+          year: 1981,
+          date: "17/03/81",
+          location: "City Center Theater, NYC",
+          duration: "00:17:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Martin Kalve",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Alan Good",
+            "Neil Greenberg",
+            "Chris Komar",
+            "Joseph Lennon",
+          ],
+        },
+        {
+          name: "Channels/Inserts",
+          year: 1981,
+          date: "24/03/81",
+          location: "City Center Theater, NYC",
+          duration: "00:28:00",
+          capsule: true,
+          decor: "",
+          costumes: "Charles Atlas",
+          lighting: "Charles Atlas",
+          music: "David Tudor",
+          cast: [
+            "Karole Armitage",
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Susan Emery",
+            "Lise Friedman",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Judy Lazaroff",
+            "Joseph Lennon",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Gallopade",
+          year: 1981,
+          date: "10/06/81",
+          location: "Sadler's Wells Theatre, London",
+          duration: "00:17:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Merce Cunningham",
+            "Susan Emery",
+            "Lise Friedman",
+            "Catherine Kerr",
+            "Judy Lazaroff",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Trails",
+          year: 1982,
+          date: "16/03/82",
+          location: "City Center Theater, NYC",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Lise Friedman",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Joseph Lennon",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Numbers",
+          year: 1982,
+          date: "18/03/82",
+          location: "City Center Theater, NYC",
+          duration: "00:33:00",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "",
+          cast: [
+            "Louise Burns",
+            "Ellen Cornfield",
+            "Susan Emery",
+            "Neil Greenberg",
+            "Judy Lazaroff",
+            "Susan Quinn",
+            "Rob Remley",
+          ],
+        },
+        {
+          name: "Quartet",
+          year: 1982,
+          date: "27/10/82",
+          location: "Théâtre des Champs-Elysées, Paris",
+          duration: "00:17:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "David Tudor",
+          cast: [
+            "Helen Barrow",
+            "Merce Cunningham",
+            "Susan Emery",
+            "Judy Lazaroff",
+            "Rob Remley",
+          ],
+        },
+        {
+          name: "Coast Zone",
+          year: 1983,
+          date: "18/03/83",
+          location: "City Center Theater, NYC",
+          duration: "00:27:00",
+          capsule: false,
+          decor: "",
+          costumes: "Charles Atlas",
+          lighting: "",
+          music: "Larry Austin",
+          cast: [
+            "Helen Barrow",
+            "Louise Burns",
+            "Lise Friedman",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Judy Lazaroff",
+            "Joseph Lennon",
+            "Susan Quinn",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Inlets 2",
+          year: 1983,
+          date: "26/10/83",
+          location: "Le Colisée, Roubaix",
+          duration: "00:20:00",
+          capsule: true,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Susan Emery",
+            "Lise Friedman",
+            "Alan Good",
+            "Chris Komar",
+            "Joseph Lennon",
+            "Karen Radford",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Roaratorio",
+          year: 1983,
+          date: "26/10/83",
+          location: "Le Colisée, Roubaix",
+          duration: "01:00:00",
+          capsule: true,
+          decor: "",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Louise Burns",
+            "Merce Cunningham",
+            "Susan Emery",
+            "Lise Friedman",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Judy Lazaroff",
+            "Joseph Lennon",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Pictures",
+          year: 1984,
+          date: "06/03/84",
+          location: "City Center Theater, NYC",
+          duration: "00:29:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "David Behrman",
+          cast: [
+            "Merce Cunningham",
+            "Helen Barrow",
+            "Louise Burns",
+            "Lise Friedman",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Joseph Lennon",
+            "Patricia Lent",
+            "Karen Radford",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+            "Susan Quinn",
+          ],
+        },
+        {
+          name: "Doubles",
+          year: 1984,
+          date: "28/07/84",
+          location: "Duke University, Durham",
+          duration: "00:25:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Helen Barrow",
+            "Louise Burns",
+            "Lise Friedman",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Joseph Lennon",
+            "Patricia Lent",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Phrases",
+          year: 1984,
+          date: "07/12/84",
+          location: "Théâtre Municipal d'Angers",
+          duration: "00:31:00",
+          capsule: false,
+          decor: "William Anastasi",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "David Tudor",
+          cast: [
+            "Helen Barrow",
+            "Louise Burns",
+            "Merce Cunningham",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Joseph Lennon",
+            "Patricia Lent",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Deli Commedia",
+          year: 1985,
+          date: "24/01/85",
+          location: "Merce Cunningham Studio, NYC",
+          duration: "00:18:00",
+          capsule: false,
+          decor: "",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "Pat Richter",
+          cast: [
+            "Brenda Daniels",
+            "Frey Faust",
+            "Kristy Santimyer",
+            "Carol Teitelbaum",
+            "Bill Young",
+          ],
+        },
+        {
+          name: "Native Green",
+          year: 1985,
+          date: "12/03/85",
+          location: "City Center Theater, NYC",
+          duration: "00:16:00",
+          capsule: true,
+          decor: "William Anastasi",
+          costumes: "William Anastasi",
+          lighting: "Aaron Copp",
+          music: "John King",
+          cast: [
+            "Helen Barrow",
+            "Alan Good",
+            "Chris Komar",
+            "Patricia Lent",
+            "Megan Walker Straight",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Arcade",
+          year: 1985,
+          date: "14/11/85",
+          location: "Annenberg Center, Philadelphia",
+          duration: "00:23:00",
+          capsule: false,
+          decor: "Dove Bradshaw",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Neil Greenberg",
+            "Catherine Kerr",
+            "Patricia Lent",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Kristy Santimyer",
+            "Kevin Schroder",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Grange Eve",
+          year: 1986,
+          date: "18/03/86",
+          location: "City Center Theater, NYC",
+          duration: "00:22:00",
+          capsule: false,
+          decor: "William Anastasi",
+          costumes: "William Anastasi",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Helen Barrow",
+            "Merce Cunningham",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "Patricia Lent",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Kristy Santimyer",
+            "Kevin Schroder",
+            "Robert Swinston",
+            "Megan Walker",
+          ],
+        },
+        {
+          name: "Fabrications",
+          year: 1987,
+          date: "21/02/87",
+          location: "Northrop Auditorium, Minneapolis",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Dove Bradshaw",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "Emanuel Dimas de Melo Pimenta",
+          cast: [
+            "Helen Barrow",
+            "Merce Cunningham",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Dennis O'Connor",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+          ],
+        },
+        {
+          name: "Shards",
+          year: 1987,
+          date: "04/03/87",
+          location: "City Center Theater, NYC",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "William Anastasi",
+          costumes: "William Anastasi",
+          lighting: "William Anastasi",
+          music: "David Tudor",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Catherine Kerr",
+            "Alan Good",
+            "David Kulick",
+            "Patricia Lent",
+            "Rob Remley",
+            "Susan Quinn Young",
+          ],
+        },
+        {
+          name: "Points in Space",
+          year: 1987,
+          date: "10/03/87",
+          location: "City Center Theater, NYC",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "William Anastasi",
+          costumes: "Dove Bradshaw",
+          lighting: "Dove Bradshaw",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Susan Quinn",
+            "Karen Radford",
+            "Rob Remley",
+            "Kristy Santimyer",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Carousal",
+          year: 1987,
+          date: "18/08/87",
+          location: "Jacob's Pillow, MA",
+          duration: "00:24:00",
+          capsule: false,
+          decor: "",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Catherine Kerr",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Karen Radford",
+            "Rob Remley",
+            "Kristy Santimyer",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Eleven",
+          year: 1988,
+          date: "09/03/88",
+          location: "Joyce Theater, NYC",
+          duration: "00:27:00",
+          capsule: false,
+          decor: "",
+          costumes: "William Anastasi",
+          lighting: "",
+          music: "Robert Ashley",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+          ],
+        },
+        {
+          name: "Five Stone",
+          year: 1988,
+          date: "16/06/88",
+          location: "Freie Volksbühne, Berlin",
+          duration: "00:55:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Merce Cunningham",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Five Stone Wind",
+          year: 1988,
+          date: "30/07/88",
+          location: "Palais des Papes, Avignon",
+          duration: "00:55:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "Mark Lancaster",
+          music: "John Cage, David Tudor, Takehisa Kosugi",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Merce Cunningham",
+            "Emma Diamond",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Cargo X",
+          year: 1988,
+          date: "09/07/88",
+          location: "University of Texas, Austin",
+          duration: "00:20:00",
+          capsule: false,
+          decor: "",
+          costumes: "Dove Bradshaw",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Helen Barrow",
+            "Emma Diamond",
+            "David Kulick",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Field and Figures",
+          year: 1989,
+          date: "17/02/89",
+          location: "Northrop Auditorium, Minneapolis",
+          duration: "",
+          capsule: false,
+          decor: "Andrew Ginzel, Kristin Jones",
+          costumes: "Andrew Ginzel, Kristin Jones",
+          lighting: "",
+          music: "Ivan Tcherepnin",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Emma Diamond",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "August Pace",
+          year: 1989,
+          date: "22/09/89",
+          location: "Zellerbach Hall, Berkeley",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "Afrika (Sergei Bugaev)",
+          costumes: "Afrika (Sergei Bugaev)",
+          lighting: "Merce Cunningham",
+          music: "Michael Pugliese",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Emma Diamond",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Inventions",
+          year: 1989,
+          date: "23/09/89",
+          location: "University of California, Berkeley",
+          duration: "00:29:00",
+          capsule: false,
+          decor: "Carl Kielblock",
+          costumes: "Carl Kielblock",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Emma Diamond",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Dennis O'Connor",
+            "Kristy Santimyer",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Polarity",
+          year: 1990,
+          date: "20/03/90",
+          location: "City Center Theater, NYC",
+          duration: "00:54:00",
+          capsule: false,
+          decor: "William Anastasi",
+          costumes: "William Anastasi",
+          lighting: "",
+          music: "David Tudor",
+          cast: [
+            "Helen Barrow",
+            "Victoria Finlayson",
+            "Alan Good",
+            "Chris Komar",
+            "Patricia Lent",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+          ],
+        },
+        {
+          name: "Neighbors",
+          year: 1991,
+          date: "13/03/91",
+          location: "City Center Theater, NYC",
+          duration: "00:25:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Victoria Finlayson",
+            "Alan Good",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Trackers",
+          year: 1991,
+          date: "20/03/91",
+          location: "City Center Theater, NYC",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Dove Bradshaw",
+          costumes: "Dove Bradshaw",
+          lighting: "Dove Bradshaw",
+          music: "Emanuel Dimas de Melo Pimenta",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Merce Cunningham",
+            "Emma Diamond",
+            "Chris Komar",
+            "Emily Navar",
+            "Randall Sanderson",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+            "Robert Wood",
+          ],
+        },
+        {
+          name: "Beach Birds",
+          year: 1991,
+          date: "20/06/91",
+          location: "Theater 11, Zürich",
+          duration: "00:28:00",
+          capsule: true,
+          decor: "",
+          costumes: "Marsha Skinner",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Victoria Finlayson",
+            "Alan Good",
+            "David Kulick",
+            "Larissa McGoldrick",
+            "Randall Sanderson",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Loosestrife",
+          year: 1991,
+          date: "10/09/91",
+          location: "Théâtre de la Ville, Paris",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Carl Kielblock",
+          costumes: "Carl Kielblock",
+          lighting: "Carl Kielblock",
+          music: "Michael Pugliese",
+          cast: [
+            "Helen Barrow",
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Merce Cunningham",
+            "Emma Diamond",
+            "Victoria Finlayson",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "Alan Good",
+            "Chris Komar",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Randall Sanderson",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Change of Address",
+          year: 1992,
+          date: "31/01/92",
+          location: "University of Texas, Austin",
+          duration: "00:24:00",
+          capsule: true,
+          decor: "Marsha Skinner",
+          costumes: "Marsha Skinner",
+          lighting: "",
+          music: "Walter Zimmermann",
+          cast: [
+            "Helen Barrow",
+            "Alan Good",
+            "Carol Teitelbaum",
+            "Chris Komar",
+            "David Kulick",
+            "Emma Diamond",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "Kimberly Bartosik",
+            "Larissa McGoldrick",
+            "Michael Cole",
+            "Patricia Lent",
+            "Randall Sanderson",
+            "Robert Swinston",
+            "Victoria Finlayson",
+          ],
+        },
+        {
+          name: "Enter",
+          year: 1992,
+          date: "17/11/92",
+          location: "Opéra National de Paris",
+          duration: "01:00:00",
+          capsule: true,
+          decor: "John Cage, Marsha Skinner",
+          costumes: "Marsha Skinner",
+          lighting: "Marsha Skinner",
+          music: "David Tudor",
+          cast: [
+            "Helen Barrow",
+            "Michael Cole",
+            "Merce Cunningham",
+            "Emma Diamond",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "Alan Good",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Chris Komar",
+            "Randall Sanderson",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Doubletoss",
+          year: 1993,
+          date: "26/02/93",
+          location: "Northrop Auditorium, Minneapolis",
+          duration: "00:27:00",
+          capsule: true,
+          decor: "Aaron Copp, Merce Cunningham",
+          costumes: "Suzanne Gallo, Merce Cunningham",
+          lighting: "Aaron Copp, Merce Cunningham",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "Alan Good",
+            "David Kulick",
+            "Patricia Lent",
+            "Larissa McGoldrick",
+            "Chris Komar",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+            "Emma Diamond",
+          ],
+        },
+        {
+          name: "Touchbase",
+          year: 1993,
+          date: "10/03/93",
+          location: "City Center Theater, NYC",
+          duration: "00:33:00",
+          capsule: false,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "Michael Pugliese",
+          cast: [
+            "Michael Cole",
+            "Emma Diamond",
+            "Jean Freebury",
+            "David Kulick",
+            "Patricia Lent",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+          ],
+        },
+        {
+          name: "CRWDSPCR",
+          year: 1993,
+          date: "15/07/93",
+          location: "Duke University, Durham",
+          duration: "00:28:00",
+          capsule: true,
+          decor: "Mark Lancaster",
+          costumes: "Mark Lancaster",
+          lighting: "",
+          music: "John King",
+          cast: [
+            "Kimberly Bartosik",
+            "Michael Cole",
+            "Emma Diamond",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "Alan Good",
+            "Chris Komar",
+            "Patricia Lent",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Carol Teitelbaum",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Breakers",
+          year: 1994,
+          date: "09/03/94",
+          location: "City Center Theater, NYC",
+          duration: "00:26:00",
+          capsule: false,
+          decor: "Mary Jean Kenton",
+          costumes: "Mary Jean Kenton",
+          lighting: "",
+          music: "John Driscoll",
+          cast: [
+            "Kimberly Bartosik",
+            "Thomas Caley",
+            "Michael Cole",
+            "Emma Diamond",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Cheryl Therrien",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Ocean",
+          year: 1994,
+          date: "18/05/94",
+          location: "Cirque Royal, Brussels",
+          duration: "01:30:00",
+          capsule: true,
+          decor: "Marsha Skinner",
+          costumes: "Marsha Skinner",
+          lighting: "Marsha Skinner, Aaron Copp",
+          music: "Andrew Culver, David Tudor",
+          cast: [
+            "Kimberly Bartosik",
+            "Thomas Caley",
+            "Michael Cole",
+            "Emma Diamond",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Cheryl Therrien",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "4'33\"",
+          year: 1994,
+          date: "15/07/94",
+          location: "Central Park SummerStage, NYC",
+          duration: "00:04:33",
+          capsule: false,
+          decor: "",
+          costumes: "",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Merce Cunningham",
+            "Emma Diamond",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Cheryl Therrien",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Ground Level Overlay",
+          year: 1995,
+          date: "08/03/95",
+          location: "City Center Theater, NYC",
+          duration: "00:32:00",
+          capsule: true,
+          decor: "Leonardo Drew",
+          costumes: "Suzanne Gallo",
+          lighting: "Aaron Copp",
+          music: "Stuart Dempster",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Cheryl Therrien",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Windows",
+          year: 1995,
+          date: "23/06/95",
+          location: "Opéra Berlioz, Montpellier",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "John Cage",
+          costumes: "Suzanne Gallo",
+          lighting: "Aaron Copp",
+          music: "Emanuel Dimas de Melo Pimenta",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Robert Swinston",
+            "Cheryl Therrien",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Tune In / Spin Out",
+          year: 1996,
+          date: "31/01/96",
+          location: "University of Texas, Austin",
+          duration: "00:28:00",
+          capsule: false,
+          decor: "",
+          costumes: "Merce Cunningham, Suzanne Gallo",
+          lighting: "",
+          music: "John Cage",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Jenifer Weaver",
+          ],
+        },
+        {
+          name: "Installations",
+          year: 1996,
+          date: "02/05/96",
+          location: "University of Washington, Seattle",
+          duration: "00:27:00",
+          capsule: false,
+          decor: "Elliot Caplan",
+          costumes: "Elliot Caplan",
+          lighting: "",
+          music: "Trimpin",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "Rondo",
+          year: 1996,
+          date: "02/06/96",
+          location: "Theater im Forum, Ludwigsburg",
+          duration: "00:26:00",
+          capsule: true,
+          decor: "",
+          costumes: "Merce Cunningham, Suzanne Gallo",
+          lighting: "Kelly Atallah",
+          music: "John Cage",
+          cast: [
+            "Kimberly Bartosik",
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "Scenario",
+          year: 1997,
+          date: "14/10/97",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Rei Kawakubo",
+          costumes: "Rei Kawakubo",
+          lighting: "Rei Kawakubo",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Michael Cole",
+            "Maydelle Fason",
+            "Jean Freebury",
+            "Frédéric (Foofwa d'Imobilité) Gafner",
+            "China Laudisio",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+          ],
+        },
+        {
+          name: "Pond Way",
+          year: 1998,
+          date: "13/01/98",
+          location: "Opéra National de Paris",
+          duration: "00:21:00",
+          capsule: true,
+          decor: "Roy Lichtenstein",
+          costumes: "Suzanne Gallo",
+          lighting: "David Covey",
+          music: "Brian Eno",
+          cast: [
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Holley Farmer",
+            "Maydelle Fason",
+            "Jean Freebury",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Jared Phillips",
+            "Glen Rumsey",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "BIPED",
+          year: 1999,
+          date: "23/04/99",
+          location: "Zellerbach Hall, Berkeley",
+          duration: "00:45:00",
+          capsule: true,
+          decor: "Shelley Eshkar, Paul Kaiser",
+          costumes: "Suzanne Gallo",
+          lighting: "Aaron Copp",
+          music: "Gavin Bryars",
+          cast: [
+            "Lisa Boudreau",
+            "Thomas Caley",
+            "Holley Farmer",
+            "Maydelle Fason",
+            "Jean Freebury",
+            "David Kulick",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Glen Rumsey",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Derry Swan",
+          ],
+        },
+        {
+          name: "Occasion Piece",
+          year: 1999,
+          date: "21/07/99",
+          location: "New York State Theater, NYC",
+          duration: "00:08:00",
+          capsule: false,
+          decor: "Jasper Johns",
+          costumes: "Suzanne Gallo",
+          lighting: "",
+          music: "John Cage",
+          cast: ["Mikhail Baryshnikov", "Merce Cunningham"],
+        },
+        {
+          name: "Interscape",
+          year: 2000,
+          date: "06/04/00",
+          location: "Kennedy Center, Washington D.C.",
+          duration: "00:44:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "Aaron Copp",
+          music: "John Cage",
+          cast: [
+            "Cédric Andrieux",
+            "Lisa Boudreau",
+            "Ashley Chen",
+            "Holley Farmer",
+            "Maydelle Fason",
+            "David Kulick",
+            "Koji Mizuta",
+            "Matthew Mohr",
+            "Banu Ogan",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "Way Station",
+          year: 2001,
+          date: "31/03/01",
+          location: "City Center Theater, NYC",
+          duration: "00:31:00",
+          capsule: true,
+          decor: "Charles Long",
+          costumes: "James Hall",
+          lighting: "Aaron Copp",
+          music: "Takehisa Kosugi",
+          cast: [
+            "Cédric Andrieux",
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Ashley Chen",
+            "Paige Cunningham",
+            "Holley Farmer",
+            "Jean Freebury",
+            "Jennifer Goggans",
+            "Mandy Kirschner",
+            "Koji Minato",
+            "Daniel Roberts",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Loose Time",
+          year: 2002,
+          date: "01/02/02",
+          location: "Zellerbach Hall, Berkeley",
+          duration: "00:30:00",
+          capsule: true,
+          decor: "Terry Winters",
+          costumes: "Terry Winters",
+          lighting: "Aaron Copp",
+          music: "Christian Wolff",
+          cast: [
+            "Cédric Andrieux",
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Ashley Chen",
+            "Paige Cunningham",
+            "Holley Farmer",
+            "Jean Freebury",
+            "Jennifer Goggans",
+            "Mandy Kirschner",
+            "Koji Mizuta",
+            "Daniel Roberts",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "Fluid Canvas",
+          year: 2002,
+          date: "10/09/02",
+          location: "Barbican Centre, London",
+          duration: "00:35:00",
+          capsule: false,
+          decor: "Marc Downie, Shelley Eshkar, Paul Kaiser",
+          costumes: "James Hall",
+          lighting: "",
+          music: "John King",
+          cast: [
+            "Cédric Andrieux",
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Ashley Chen",
+            "Paige Cunningham",
+            "Holley Farmer",
+            "Jean Freebury",
+            "Jennifer Goggans",
+            "Mandy Kirschner",
+            "Koji Mizuta",
+            "Daniel Roberts",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+            "Cheryl Therrien",
+          ],
+        },
+        {
+          name: "Split Sides",
+          year: 2003,
+          date: "14/10/03",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "00:40:00",
+          capsule: true,
+          decor: "Catherine Yass, Robert Heishman",
+          costumes: "James Hall",
+          lighting: "James F. Ingalls",
+          music: "Radiohead, Sigur Rós",
+          cast: [
+            "Cédric Andrieux",
+            "Mikhail Baryshnikov",
+            "Lisa Boudreau",
+            "Ashley Chen",
+            "Paige Cunningham",
+            "Holley Farmer",
+            "Jennifer Goggans",
+            "Mandy Kirschner",
+            "Koji Mizuta",
+            "Daniel Roberts",
+            "Cheryl Therrien",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Derry Swan",
+            "Robert Swinston",
+          ],
+        },
+        {
+          name: "Views on Stage",
+          year: 2004,
+          date: "29/10/04",
+          location: "Edinburgh Festival Theatre",
+          duration: "00:25:00",
+          capsule: true,
+          decor: "Ernesto Neto",
+          costumes: "James Hall",
+          lighting: "Josh Johnson",
+          music: "John Cage",
+          cast: [
+            "Cédric Andrieux",
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Holley Farmer",
+            "Jennifer Goggans",
+            "Rashaun Mitchell",
+            "Koji Mizuta",
+            "Marcie Munnerlyn",
+            "Daniel Roberts",
+            "Daniel Squire",
+            "Jeannie Steele",
+            "Robert Swinston",
+            "Andrea Weber",
+          ],
+        },
+        {
+          name: "eyeSpace (20')",
+          year: 2006,
+          date: "10/10/06",
+          location: "Joyce Theater, NYC",
+          duration: "00:20:00",
+          capsule: true,
+          decor: "Henry Samelson",
+          costumes: "Henry Samelson",
+          lighting: "Josh Johnson",
+          music: "Mikel Rouse",
+          cast: [
+            "Cédric Andrieux",
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Brandon Collwes",
+            "Julie Cunningham",
+            "Emma Desjardins",
+            "Holley Farmer",
+            "Jennifer Goggans",
+            "Koji Mizuta",
+            "Marcie Munnerlyn",
+            "Daniel Squire",
+            "Andrea Weber",
+          ],
+        },
+        {
+          name: "eyeSpace (40')",
+          year: 2007,
+          date: "23/02/07",
+          location: "Opera House, Miami",
+          duration: "00:40:00",
+          capsule: true,
+          decor: "Daniel Arsham",
+          costumes: "Daniel Arsham",
+          lighting: "Josh Johnson",
+          music: "Annea Lockwood, David Behrman",
+          cast: [
+            "Cédric Andrieux",
+            "Lisa Boudreau",
+            "Brandon Collwes",
+            "Emma Desjardins",
+            "Jennifer Goggans",
+            "Rashaun Mitchell",
+            "Marcie Munnerlyn",
+            "Melissa Toogood",
+            "Andrea Weber",
+            "Daniel Squire",
+            "Koji Mizuta",
+            "Holley Farmer",
+            "Jonah Bokaer",
+          ],
+        },
+        {
+          name: "XOVER",
+          year: 2007,
+          date: "05/10/07",
+          location: "Hopkins Center, Dartmouth",
+          duration: "00:21:00",
+          capsule: true,
+          decor: "Robert Rauschenberg",
+          costumes: "Robert Rauschenberg",
+          lighting: "Josh Johnson",
+          music: "John Cage",
+          cast: [
+            "Jonah Bokaer",
+            "Lisa Boudreau",
+            "Brandon Collwes",
+            "Julie Cunningham",
+            "Emma Desjardins",
+            "Holley Farmer",
+            "Jennifer Goggans",
+            "Daniel Madoff",
+            "Rashaun Mitchell",
+            "Koji Mizuta",
+            "Marcie Munnerlyn",
+            "Daniel Squire",
+            "Andrea Weber",
+          ],
+        },
+        {
+          name: "Nearly Ninety",
+          year: 2009,
+          date: "16/04/09",
+          location: "Brooklyn Academy of Music, NYC",
+          duration: "01:26:00",
+          capsule: true,
+          decor: "Benedetta Tagliabue",
+          costumes: "Romeo Gigli",
+          lighting: "Brian MacDevitt",
+          music: "Takehisa Kosugi, John Paul Jones",
+          cast: [
+            "Brandon Collwes",
+            "Julie Cunningham",
+            "Emma Desjardins",
+            "Holley Farmer",
+            "Jennifer Goggans",
+            "Daniel Madoff",
+            "Rashaun Mitchell",
+            "Koji Mizuta",
+            "Marcie Munnerlyn",
+            "Silas Riener",
+            "Daniel Squire",
+            "Melissa Toogood",
+            "Andrea Weber",
+          ],
+        },
+        {
+          name: "Nearly 90²",
+          year: 2009,
+          date: "25/09/09",
+          location: "Krannert Center, Urbana",
+          duration: "01:26:00",
+          capsule: true,
+          decor: "",
+          costumes: "Anna Finke",
+          lighting: "Christine Shallenberg",
+          music: "John Paul Jones, Takehisa Kosugi",
+          cast: [
+            "Brandon Collwes",
+            "Dylan Crossman",
+            "Julie Cunningham",
+            "Emma Desjardins",
+            "Jennifer Goggans",
+            "John Hinrichs",
+            "Daniel Madoff",
+            "Rashaun Mitchell",
+            "Marcie Munnerlyn",
+            "Silas Riener",
+            "Jamie Scott",
+            "Melissa Toogood",
+            "Andrea Weber",
+          ],
+        },
+      ];
+
+      const allYears = [...new Set(spectacles.map((s) => s.year))].sort(
+        (a, b) => a - b,
+      );
+      const minYear = allYears[0],
+        maxYear = allYears[allYears.length - 1];
+      const maxCastAll = Math.max(...spectacles.map((s) => s.cast.length));
+      const yearMap = {};
+      spectacles.forEach((s, i) => {
+        if (!yearMap[s.year]) yearMap[s.year] = [];
+        yearMap[s.year].push(i);
+      });
+
+      const els = {};
+      [
+        "min-year-slider",
+        "max-year-slider",
+        "min-year-value",
+        "max-year-value",
+        "min-cast-slider",
+        "max-cast-slider",
+        "min-cast-value",
+        "max-cast-value",
+        "filter-merce",
+        "filter-no-merce",
+        "filter-capsule-only",
+        "filter-stats",
+      ].forEach((id) => {
+        els[id] = document.getElementById(id);
+      });
+      els["min-year-slider"].min = minYear;
+      els["min-year-slider"].max = maxYear;
+      els["min-year-slider"].value = minYear;
+      els["max-year-slider"].min = minYear;
+      els["max-year-slider"].max = maxYear;
+      els["max-year-slider"].value = maxYear;
+      els["min-year-value"].textContent = minYear;
+      els["max-year-value"].textContent = maxYear;
+      els["min-cast-slider"].max = maxCastAll;
+      els["max-cast-slider"].max = maxCastAll;
+      els["max-cast-slider"].value = maxCastAll;
+      els["max-cast-value"].textContent = maxCastAll;
+
+      // Scene and renderer setup: create the 3D canvas and camera
+      const container = document.getElementById("container");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0a0a1a);
+      scene.fog = new THREE.FogExp2(0x0a0a1a, 0.0006);
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        innerWidth / innerHeight,
+        0.1,
+        5000,
+      );
+      camera.position.set(100, 180, 280);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+      const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
+      ctrl.enableDamping = true;
+      ctrl.dampingFactor = 0.05;
+      ctrl.target.set(0, 140, 0);
+      ctrl.update();
+      scene.add(new THREE.AmbientLight(0x334466, 0.6));
+      const dl = new THREE.DirectionalLight(0xffffff, 0.8);
+      dl.position.set(100, 300, 100);
+      scene.add(dl);
+      const pl = new THREE.PointLight(0x4488ff, 0.5, 600);
+      pl.position.set(0, 180, 0);
+      scene.add(pl);
+
+      const yScale = 5,
+        axisH = (maxYear - minYear) * yScale;
+      scene.add(
+        new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, axisH, 0),
+          ]),
+          new THREE.LineBasicMaterial({ color: 0x1a3050 }),
+        ),
+      );
+      // Create a 2D canvas sprite for year labels on the timeline
+      function mkSpr(t, c = "#4a6a90") {
+        const cv = document.createElement("canvas");
+        cv.width = 256;
+        cv.height = 64;
+        const x = cv.getContext("2d");
+        x.font = "bold 48px monospace";
+        x.fillStyle = c;
+        x.textAlign = "center";
+        x.fillText(t, 128, 48);
+        const s = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: new THREE.CanvasTexture(cv),
+            transparent: true,
+          }),
+        );
+        s.scale.set(20, 5, 1);
+        return s;
+      }
+      for (let y = Math.ceil(minYear / 5) * 5; y <= maxYear; y += 5) {
+        const s = mkSpr(String(y));
+        s.position.set(-20, (y - minYear) * yScale, 0);
+        scene.add(s);
+      }
+      if (minYear % 5 !== 0) {
+        const s = mkSpr(String(minYear));
+        s.position.set(-20, 0, 0);
+        scene.add(s);
+      }
+
+      // Color palette used for node materials and highlights
+      const C = {
+        m: new THREE.Color(0xffcc44),
+        mE: new THREE.Color(0x664400),
+        mL: new THREE.Color(0x997722),
+        b: new THREE.Color(0x4a9eff),
+        bE: new THREE.Color(0x1a3060),
+        bL: new THREE.Color(0x1a4070),
+        cap: new THREE.Color(0x44ddaa),
+        capE: new THREE.Color(0x0a3030),
+        capL: new THREE.Color(0x227755),
+        hi: new THREE.Color(0xff6a6a),
+      };
+
+      // Build the visual nodes for each spectacle and place them radially by year
+      const specNodes = [];
+      const rayR = 55;
+      spectacles.forEach((spec, si) => {
+        const y = (spec.year - minYear) * yScale;
+        const grp = yearMap[spec.year],
+          idx = grp.indexOf(si),
+          cnt = grp.length;
+        const ang = (idx * (2 * Math.PI)) / Math.max(cnt, 1);
+        const r = rayR + (idx % 4) * 10;
+        const px = Math.cos(ang) * r,
+          pz = Math.sin(ang) * r;
+        const hasMerce = spec.cast.includes("Merce Cunningham");
+        const nr = Math.max(0.5, 0.5 + spec.cast.length * 0.1);
+        const col = spec.capsule ? C.cap : hasMerce ? C.m : C.b;
+        const em = spec.capsule ? C.capE : hasMerce ? C.mE : C.bE;
+        const lCol = spec.capsule ? C.capL : hasMerce ? C.mL : C.bL;
+        const geo = spec.capsule
+          ? new THREE.OctahedronGeometry(nr, 1)
+          : new THREE.SphereGeometry(nr, 12, 12);
+        const mesh = new THREE.Mesh(
+          geo,
+          new THREE.MeshPhongMaterial({
+            color: col.clone(),
+            emissive: em.clone(),
+            shininess: 80,
+            transparent: true,
+            opacity: 0.9,
+          }),
+        );
+        mesh.position.set(px, y, pz);
+        scene.add(mesh);
+        const line = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, y, 0),
+            new THREE.Vector3(px, y, pz),
+          ]),
+          new THREE.LineBasicMaterial({
+            color: lCol.clone(),
+            transparent: true,
+            opacity: 0.3,
+          }),
+        );
+        scene.add(line);
+        mesh.userData = { si: si, hasMerce: hasMerce, isCapsule: spec.capsule };
+        specNodes.push({
+          mesh: mesh,
+          line: line,
+          si: si,
+          hasMerce: hasMerce,
+          isCapsule: spec.capsule,
+        });
+      });
+
+      function defStyle(sn) {
+        const s = spectacles[sn.si];
+        const cap = s.capsule;
+        const m = sn.hasMerce;
+        return {
+          nc: cap ? C.cap : m ? C.m : C.b,
+          em: cap ? C.capE : m ? C.mE : C.bE,
+          lc: cap ? C.capL : m ? C.mL : C.bL,
+          op: 0.9,
+          lo: 0.3,
+        };
+      }
+      function setS(sn, s) {
+        sn.mesh.visible = true;
+        sn.line.visible = true;
+        sn.mesh.material.color.copy(s.nc);
+        sn.mesh.material.emissive.copy(s.em);
+        sn.mesh.material.opacity = s.op;
+        sn.line.material.color.copy(s.lc);
+        sn.line.material.opacity = s.lo;
+      }
+
+      // Filtering state for the UI controls
+      let fYMin = minYear,
+        fYMax = maxYear,
+        fCMin = 0,
+        fCMax = maxCastAll,
+        fMerce = true,
+        fNoMerce = true,
+        fCapOnly = false;
+      function passes(spec) {
+        if (spec.year < fYMin || spec.year > fYMax) return false;
+        if (spec.cast.length < fCMin || spec.cast.length > fCMax) return false;
+        const m = spec.cast.includes("Merce Cunningham");
+        if (m && !fMerce) return false;
+        if (!m && !fNoMerce) return false;
+        if (fCapOnly && !spec.capsule) return false;
+        return true;
+      }
+      function applyF() {
+        let n = 0;
+        specNodes.forEach((sn) => {
+          const sp = spectacles[sn.si];
+          if (passes(sp)) {
+            setS(sn, defStyle(sn));
+            n++;
+          } else {
+            sn.mesh.visible = false;
+            sn.line.visible = false;
+          }
+        });
+        els["filter-stats"].innerHTML =
+          "<strong>" + n + "</strong> / " + spectacles.length + " spectacles";
+      }
+      applyF();
+
+      // Helper for wire-up of range sliders
+      function bindSlider(sid, lid, setter) {
+        document.getElementById(sid).addEventListener("input", function () {
+          const v = parseInt(this.value);
+          document.getElementById(lid).textContent = v;
+          setter(v);
+          applyF();
+        });
+      }
+      bindSlider("min-year-slider", "min-year-value", function (v) {
+        if (v > fYMax) {
+          v = fYMax;
+          els["min-year-slider"].value = v;
+          els["min-year-value"].textContent = v;
+        }
+        fYMin = v;
+      });
+      bindSlider("max-year-slider", "max-year-value", function (v) {
+        if (v < fYMin) {
+          v = fYMin;
+          els["max-year-slider"].value = v;
+          els["max-year-value"].textContent = v;
+        }
+        fYMax = v;
+      });
+      bindSlider("min-cast-slider", "min-cast-value", function (v) {
+        if (v > fCMax) {
+          v = fCMax;
+          els["min-cast-slider"].value = v;
+          els["min-cast-value"].textContent = v;
+        }
+        fCMin = v;
+      });
+      bindSlider("max-cast-slider", "max-cast-value", function (v) {
+        if (v < fCMin) {
+          v = fCMin;
+          els["max-cast-slider"].value = v;
+          els["max-cast-value"].textContent = v;
+        }
+        fCMax = v;
+      });
+      els["filter-merce"].addEventListener("change", function () {
+        fMerce = this.checked;
+        applyF();
+      });
+      els["filter-no-merce"].addEventListener("change", function () {
+        fNoMerce = this.checked;
+        applyF();
+      });
+      els["filter-capsule-only"].addEventListener("change", function () {
+        fCapOnly = this.checked;
+        applyF();
+      });
+      document
+        .getElementById("btn-reset")
+        .addEventListener("click", function () {
+          fYMin = minYear;
+          fYMax = maxYear;
+          fCMin = 0;
+          fCMax = maxCastAll;
+          fMerce = true;
+          fNoMerce = true;
+          fCapOnly = false;
+          els["min-year-slider"].value = minYear;
+          els["max-year-slider"].value = maxYear;
+          els["min-cast-slider"].value = 0;
+          els["max-cast-slider"].value = maxCastAll;
+          els["min-year-value"].textContent = minYear;
+          els["max-year-value"].textContent = maxYear;
+          els["min-cast-value"].textContent = "0";
+          els["max-cast-value"].textContent = maxCastAll;
+          els["filter-merce"].checked = true;
+          els["filter-no-merce"].checked = true;
+          els["filter-capsule-only"].checked = false;
+          applyF();
+        });
+
+      // =====================================================
+      // HOVER + PIN (FIXED)
+      // =====================================================
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      let hoveredSi = null;
+      let pinnedSi = null;
+      let isPinned = false;
+
+      const card = document.getElementById("info-card");
+
+      // Populate the info card with data for the selected spectacle
+      function populateCard(si) {
+        const s = spectacles[si];
+        document.getElementById("card-name").textContent = s.name;
+        const cs = s.cast.length;
+        const label =
+          cs === 0
+            ? "No cast data"
+            : cs === 1
+              ? "Solo"
+              : cs === 2
+                ? "Duet"
+                : cs <= 5
+                  ? "Small ensemble"
+                  : cs <= 10
+                    ? "Ensemble"
+                    : "Large ensemble";
+        let sub = label + " · " + cs + " performer" + (cs !== 1 ? "s" : "");
+        if (s.duration)
+          sub += ' <span class="duration-badge">' + s.duration + "</span>";
+        if (s.capsule) sub += ' <span class="capsule-badge">Capsule</span>';
+        document.getElementById("card-subtitle").innerHTML = sub;
+        let meta =
+          '<div class="meta-line"><strong>Premiered:</strong> ' +
+          s.date +
+          "</div>";
+        meta +=
+          '<div class="meta-line"><strong>Location:</strong> ' +
+          s.location +
+          "</div>";
+        document.getElementById("card-meta").innerHTML = meta;
+        let collabs = "";
+        if (s.music)
+          collabs +=
+            '<div class="collab-line"><span class="role">Music:</span> ' +
+            s.music +
+            "</div>";
+        if (s.decor)
+          collabs +=
+            '<div class="collab-line"><span class="role">Decor:</span> ' +
+            s.decor +
+            "</div>";
+        if (s.costumes)
+          collabs +=
+            '<div class="collab-line"><span class="role">Costumes:</span> ' +
+            s.costumes +
+            "</div>";
+        if (s.lighting)
+          collabs +=
+            '<div class="collab-line"><span class="role">Lighting:</span> ' +
+            s.lighting +
+            "</div>";
+        document.getElementById("card-collabs").innerHTML = collabs;
+        if (cs === 0) {
+          document.getElementById("card-cast").innerHTML =
+            '<span style="color:#5a7a9a;font-style:italic;">No cast data</span>';
+          document.getElementById("card-cast-count").textContent = "";
+        } else {
+          const sorted = [...s.cast].sort(function (a, b) {
+            if (a === "Merce Cunningham") return -1;
+            if (b === "Merce Cunningham") return 1;
+            return a.localeCompare(b);
+          });
+          document.getElementById("card-cast").innerHTML = sorted
+            .map(function (n) {
+              return (
+                '<span class="cast-member' +
+                (n === "Merce Cunningham" ? " merce" : "") +
+                '">' +
+                n +
+                "</span>"
+              );
+            })
+            .join(", ");
+          document.getElementById("card-cast-count").textContent =
+            cs + " in original cast";
+        }
+      }
+
+      // Position the info card near the mouse cursor while keeping it inside the viewport
+      function positionCard(cx, cy) {
+        const w = 400,
+          m = 16;
+        card.style.visibility = "hidden";
+        card.style.display = "block";
+        card.style.left = "0px";
+        card.style.top = "0px";
+        const h = card.offsetHeight;
+        card.style.visibility = "";
+        let x = cx + 20,
+          y = cy - 10;
+        if (x + w + m > innerWidth) x = cx - w - 20;
+        if (x < m) x = m;
+        if (x + w + m > innerWidth) x = innerWidth - w - m;
+        if (y + h + m > innerHeight) y = innerHeight - h - m;
+        if (y < m) y = m;
+        card.style.left = x + "px";
+        card.style.top = y + "px";
+      }
+
+      function highlightNode(si) {
+        const sn = specNodes[si];
+        sn.mesh.material.color.copy(C.hi);
+        sn.mesh.material.emissive.set(0x661a1a);
+        sn.mesh.scale.setScalar(1.6);
+        sn.line.material.color.copy(C.hi);
+        sn.line.material.opacity = 0.8;
+      }
+
+      function unhighlightNode(si) {
+        if (si === null || si === undefined) return;
+        const sn = specNodes[si];
+        sn.mesh.scale.setScalar(1);
+        const sp = spectacles[si];
+        if (passes(sp)) {
+          setS(sn, defStyle(sn));
+        } else {
+          sn.mesh.visible = false;
+          sn.line.visible = false;
+        }
+      }
+
+      function raycastHit(cx, cy) {
+        mouse.x = (cx / innerWidth) * 2 - 1;
+        mouse.y = -(cy / innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const visible = [];
+        for (var i = 0; i < specNodes.length; i++) {
+          if (specNodes[i].mesh.visible) visible.push(specNodes[i].mesh);
+        }
+        const hits = raycaster.intersectObjects(visible);
+        if (hits.length > 0) return hits[0].object.userData.si;
+        return null;
+      }
+
+      function showCard(si, cx, cy) {
+        populateCard(si);
+        positionCard(cx, cy);
+        card.style.display = "block";
+        if (card.classList.contains("pinned")) {
+          card.style.pointerEvents = "auto";
+        }
+      }
+
+      function hideCard(force = false) {
+        if (isPinned && !force) return;
+        card.style.display = "none";
+        card.classList.remove("pinned");
+        card.style.pointerEvents = "none";
+      }
+
+      function pinCard(si, cx, cy) {
+        // Unpin previous if different
+        if (pinnedSi !== null && pinnedSi !== si) {
+          unhighlightNode(pinnedSi);
+        }
+        pinnedSi = si;
+        hoveredSi = si;
+        isPinned = true;
+        highlightNode(si);
+        card.classList.add("pinned");
+        card.style.pointerEvents = "auto";
+        showCard(si, cx, cy);
+      }
+
+      function unpinCard() {
+        if (pinnedSi !== null) {
+          unhighlightNode(pinnedSi);
+        }
+        pinnedSi = null;
+        hoveredSi = null;
+        isPinned = false;
+        hideCard(true);
+      }
+
+      // Close button
+      document
+        .getElementById("pin-close")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          unpinCard();
+        });
+
+      // Also close if clicking on the pinned card background (outside close button)
+      // Not needed - just the X button
+
+      // MOUSE EVENTS ON CANVAS
+      renderer.domElement.addEventListener("mousemove", function (e) {
+        // If pinned, don't do hover behavior
+        if (isPinned) return;
+
+        var si = raycastHit(e.clientX, e.clientY);
+        if (si !== null) {
+          if (hoveredSi !== si) {
+            if (hoveredSi !== null) unhighlightNode(hoveredSi);
+            hoveredSi = si;
+            highlightNode(si);
+          }
+          showCard(si, e.clientX, e.clientY);
+        } else {
+          if (hoveredSi !== null) {
+            unhighlightNode(hoveredSi);
+            hoveredSi = null;
+          }
+          hideCard();
+        }
+      });
+
+      renderer.domElement.addEventListener("click", function (e) {
+        var si = raycastHit(e.clientX, e.clientY);
+        if (si === null) return;
+
+        if (isPinned) {
+          if (si !== pinnedSi) {
+            pinCard(si, e.clientX, e.clientY);
+          }
+        } else {
+          pinCard(si, e.clientX, e.clientY);
+        }
+      });
+
+      // Prevent canvas click from also triggering on the card
+      card.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+      card.addEventListener("mousedown", function (e) {
+        e.stopPropagation();
+      });
+
+      // PARTICLES & GRID
+      var pg = new THREE.BufferGeometry(),
+        pp = new Float32Array(400 * 3);
+      for (var i = 0; i < 400; i++) {
+        pp[i * 3] = (Math.random() - 0.5) * 400;
+        pp[i * 3 + 1] = Math.random() * axisH;
+        pp[i * 3 + 2] = (Math.random() - 0.5) * 400;
+      }
+      pg.setAttribute("position", new THREE.BufferAttribute(pp, 3));
+      scene.add(
+        new THREE.Points(
+          pg,
+          new THREE.PointsMaterial({
+            color: 0x2244aa,
+            size: 0.4,
+            transparent: true,
+            opacity: 0.25,
+          }),
+        ),
+      );
+      var g = new THREE.GridHelper(350, 35, 0x111133, 0x0a0a22);
+      g.position.y = -5;
+      scene.add(g);
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        ctrl.update();
+        renderer.render(scene, camera);
+      })();
+      addEventListener("resize", function () {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+    </script>
+  </body>
+</html>
