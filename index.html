@@ -9,7 +9,7 @@
     />
     <meta
       name="description"
-      content="An experimenta and interactive 3D timeline of Merce Cunningham's dance works and cast. Includes filtering by year, cast, and capsule pieces, with detailed info cards for each spectacle. Data sourced from https://zenodo.org/records/3774548 and used under CC BY-NC-SA 4.0. Cards include links to original data capsules where available."
+      content="An experimental and interactive 3D timeline of Merce Cunningham's dance works and cast. Includes filtering by year, cast, and capsule pieces, with detailed info cards for each spectacle. Data sourced from https://zenodo.org/records/3774548 and used under CC BY-NC-SA 4.0. Cards include links to original data capsules where available."
     />
     <meta
       name="keywords"
@@ -4345,7 +4345,7 @@
       renderer.domElement.style.touchAction = "none";
       const ctrl = new THREE.OrbitControls(camera, renderer.domElement);
       ctrl.enableDamping = true;
-      ctrl.dampingFactor = 0.05;
+      ctrl.dampingFactor = 0.005;
       ctrl.target.set(0, 140, 0);
       ctrl.update();
       scene.add(new THREE.AmbientLight(0x334466, 0.6));
